@@ -3,17 +3,80 @@ import reactLogo from './assets/react.svg'
 import './App.css'
 
 type Color = 'green' | 'yellow' | 'darkGray' | 'lightGray'
+
+const Cell = ({ letter, color }: { letter: string, color: Color }) => {
+  return (
+    <div className={letter === '' ?
+      `cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md` :
+      `cell rounded-lg aspect-square h-14 flex justify-center items-center text-white text-2xl font-bold bg-${color}`
+    }>
+      {letter}
+    </div>
+  )
+}
+
+const Row = ({ letters, colors }: { letters: string[], colors: Color[] }) => {
+  return (
+    <div className="row word-container flex gap-2 mb-5">
+      {letters.map((letter, index) => <Cell letter={letter} color={colors[index]} />)}
+    </div>
+  )
+}
+
 function App() {
-  const [word, setWord] = useState('')
+  const numTrials = 5, wordLength = 5
+  const [userWord, setUserWord] = useState('')
   const [targetWord, setTargetWord] = useState("")
-  const [keyboard, setKeyboard] = useState<{ letter: string, color: Color }[]>("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').map(letter => ({ letter, color: 'lightGray' })))
+  const [wordsList, setWordsList] = useState<({ letter: string, color: Color }[] | null)[]>([])
+  const [keyboard, setKeyboard] = useState<{ letter: string, color: Color }[]>([])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e && e.preventDefault()
+
+    if (userWord.length !== wordLength) {
+      return alert('Word must be 5 letters long!')
+    }
 
     try {
-      console.log(word)
-      setWord('')
+      const tryIndex = wordsList.findIndex(word => word === null)
+      const newKeyboard = [...keyboard]
+
+      // Current word to 'push' to wordsList
+      const currentWord = userWord.split('').map((letter, index) => {
+        let color: Color = 'darkGray'
+
+        if (letter === targetWord[index]) {
+          color = 'green'
+        }
+        else if (targetWord.includes(letter)) {
+          color = 'yellow'
+        }
+
+        // Update keyboard if letter hasn't been used yet
+        const letterIndex = newKeyboard.findIndex(key => key.letter === letter)
+        if (letterIndex !== -1 && newKeyboard[letterIndex].color !== 'green') {
+          newKeyboard[letterIndex].color = color
+        }
+
+        return { letter, color }
+      })
+
+      const newWordsList = [...wordsList]
+      newWordsList[tryIndex] = currentWord
+      setWordsList(newWordsList)
+      setKeyboard(newKeyboard)
+
+      setTimeout(() => {
+        if (userWord === targetWord) {
+          alert('You win!\n The word was: ' + targetWord)
+          initialize()
+        } else if (tryIndex === numTrials - 1) {
+          alert('You lose!\n The word was: ' + targetWord)
+          initialize()
+        }
+      }, 500);
+
+      setUserWord('')
     } catch (error) {
       console.log(error)
     }
@@ -25,28 +88,32 @@ function App() {
       return
     }
 
-    setWord(e.target.value.toUpperCase())
+    setUserWord(e.target.value.toUpperCase())
   }
 
-  const getWord = async () => {
+  async function getWord() {
     const options = {
       method: 'GET',
       headers: {
         'X-RapidAPI-Key': 'f5ebd356d8mshfb9c83c7a603a2ap1e7863jsn133d88196a3f',
         'X-RapidAPI-Host': 'random-words5.p.rapidapi.com'
       }
-    };
+    }
 
-    const response = await fetch('https://random-words5.p.rapidapi.com/getRandom?wordLength=5', options)
+    const response = await fetch(`https://random-words5.p.rapidapi.com/getRandom?wordLength=${wordLength}`, options)
     const body: string = await response.text()
     setTargetWord(body.toUpperCase())
   }
 
-  useEffect(() => {
+  async function initialize() {
     getWord()
-  }, [])
+    setWordsList(Array(numTrials).fill(null))
+    setKeyboard("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').map(letter => ({ letter, color: 'lightGray' })))
+  }
 
-  console.log(keyboard)
+  useEffect(() => {
+    initialize()
+  }, [])
 
   return (
     <div className="App h-screen flex flex-col">
@@ -58,72 +125,17 @@ function App() {
 
       <div className="game-container flex flex-col flex-grow items-center justify-evenly">
         <div className="words-list">
-          <div className="row word-container flex gap-2 mb-5">
-            <div className="cell rounded-lg aspect-square h-14 flex justify-center items-center text-white text-2xl font-medium bg-darkGray">
-              A
-            </div>
-            <div className="cell rounded-lg aspect-square h-14 flex justify-center items-center text-white text-2xl font-medium bg-green">
-              B
-            </div>
-            <div className="cell rounded-lg aspect-square h-14 flex justify-center items-center text-white text-2xl font-medium bg-yellow">
-              C
-            </div>
-            <div className="cell rounded-lg aspect-square h-14 flex justify-center items-center text-white text-2xl font-medium bg-darkGray">
-              D
-            </div>
-            <div className="cell rounded-lg aspect-square h-14 flex justify-center items-center text-white text-2xl font-medium bg-green">
-              E
-            </div>
-          </div>
-          <div className="row word-container flex gap-2 mb-5">
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-          </div>
-          <div className="row word-container flex gap-2 mb-5">
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-          </div>
-          <div className="row word-container flex gap-2 mb-5">
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-          </div>
-          <div className="row word-container flex gap-2 mb-5">
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-            <div className="cell aspect-square h-14 flex justify-center items-center border-solid border border-slate-700 rounded-md">
-            </div>
-          </div>
-
+          {wordsList.map((word, index) => {
+            return (
+              <div key={index} className="row word-container flex gap-2 mb-5">
+                {
+                  word ?
+                    word.map((letter, index) => <Cell key={index} letter={letter.letter} color={letter.color} />) :
+                    Array(5).fill(null).map((_, index) => <Cell key={index} letter={''} color="lightGray" />)
+                }
+              </div>
+            )
+          })}
         </div>
 
         <div className="letters-container flex flex-wrap gap-2 absolute left-10 w-3/12 max-w-xs justify-center">
@@ -131,15 +143,34 @@ function App() {
             Letters
           </h2>
           {keyboard.map((letter, index) => (
-            <div key={index} className={`letter rounded-lg h-12 w-10 flex justify-center items-center text-white text-xl font-medium bg-${letter.color}`}>
+            <div key={index} className={`letter rounded-lg h-12 w-10 flex justify-center items-center text-white text-xl font-medium bg-${letter.color} cursor-pointer active:bg-slate-300 hover:bg-slate-400`}
+              onClick={() => {
+                handleWordChange({ target: { value: userWord + letter.letter } } as React.ChangeEvent<HTMLInputElement>)
+              }}>
               {letter.letter}
             </div>
           ))}
+          <div className='actions flex gap-2 w-full justify-center mt-2'>
+            <div className={`letter rounded-lg h-12 w-16 flex justify-center items-center text-white text-xl font-medium bg-slate-500 cursor-pointer active:bg-slate-300 hover:bg-slate-400`}
+              onClick={() => {
+                handleWordChange({ target: { value: userWord.slice(0, -1) } } as React.ChangeEvent<HTMLInputElement>)
+              }}>
+              {'<-'}
+            </div>
+
+            <div className={`letter rounded-lg h-12 w-16 flex justify-center items-center text-white text-xl font-medium bg-slate-500 cursor-pointer active:bg-slate-300 hover:bg-slate-400`}
+              onClick={() => {
+                console.log('ok')
+                handleSubmit(null as unknown as React.FormEvent<HTMLFormElement>)
+              }}>
+              {'OK'}
+            </div>
+          </div>
         </div>
 
         <form className='input-container' onSubmit={handleSubmit}>
           {/* i want to autocapitalize all letters to uppercase */}
-          <input type="text" name="word" id="word" value={word} onChange={handleWordChange} autoCorrect="off" className='border-solid border border-b-slate-700 bg-gray-200 py-2 px-4 rounded' autoComplete="off" placeholder='Enter a word!' autoFocus/>
+          <input type="text" name="word" id="word" value={userWord} onChange={handleWordChange} autoCorrect="off" className='border-solid border border-b-slate-700 bg-gray-200 py-2 px-4 rounded' autoComplete="off" placeholder='Enter a word!' autoFocus />
           <button type="submit" className='bg-green text-white font-bold py-2 px-4 rounded mx-2'>
             Submit
           </button>
