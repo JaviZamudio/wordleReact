@@ -19,4 +19,5 @@ module.exports = {
     },
   },
   plugins: [],
+  safelist: ["bg-green", "bg-yellow", "bg-lightGray", "bg-darkGray"],
 }
