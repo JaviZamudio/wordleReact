@@ -125,7 +125,7 @@ function App() {
         </h1>
       </header>
 
-      <p className='absolute top-5 right-5'>By<a href="https://github.com/JaviZamudio" target="_blank" rel="noreferrer" className='text-blue-500 ml-1'> Javi Zamudio</a></p>
+      {/* <p className='absolute top-5 right-5'>By<a href="https://github.com/JaviZamudio" target="_blank" rel="noreferrer" className='text-blue-500 ml-1'> Javi Zamudio</a></p> */}
 
       <div className="game-container flex flex-col flex-grow items-center justify-evenly">
         <div className="words-list">
