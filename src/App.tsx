@@ -100,10 +100,10 @@ function App() {
       }
     }
 
-    // const response = await fetch(`https://random-words5.p.rapidapi.com/getRandom?wordLength=${wordLength}`, options)
-    // const body: string = await response.text()
+    const response = await fetch(`https://random-words5.p.rapidapi.com/getRandom?wordLength=${wordLength}`, options)
+    const body: string = await response.text()
 
-    const body = 'hello'
+    // const body = 'hello'
     setTargetWord(body.toUpperCase())
   }
 
@@ -125,7 +125,7 @@ function App() {
         </h1>
       </header>
 
-      {/* <p className='absolute top-5 right-5'>By<a href="https://github.com/JaviZamudio" target="_blank" rel="noreferrer" className='text-blue-500 ml-1'> Javi Zamudio</a></p> */}
+      <p className='absolute top-5 right-5'>By<a href="https://github.com/JaviZamudio" target="_blank" rel="noreferrer" className='text-blue-500 ml-1'> Javi Zamudio</a></p>
 
       <div className="game-container flex flex-col flex-grow items-center justify-evenly">
         <div className="words-list">
@@ -142,7 +142,7 @@ function App() {
           })}
         </div>
 
-        <div className="letters-container flex flex-wrap gap-2 absolute left-10 w-3/12 max-w-xs justify-center">
+        <div className="letters-container flex flex-wrap gap-2 absolute left-10 w-3/12 max-w-xs justify-center sm:hidden">
           <h2 className='text-2xl font-bold text-center w-full mb-2'>
             Letters
           </h2>
