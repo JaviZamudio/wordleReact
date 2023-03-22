@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import reactLogo from './assets/react.svg'
+import gitHubLogo from './assets/github-mark.png'
 import './App.css'
 
 type Color = 'green' | 'yellow' | 'darkGray' | 'lightGray'
@@ -180,6 +180,12 @@ function App() {
           </button>
         </form>
       </div>
+
+      {/* view on github */}
+      <a href="https://github.com/JaviZamudio/wordleReact" target="_blank" rel="noreferrer" className='absolute bottom-5 right-5 flex items-center'>
+        <p className='text-sm'>View on GitHub</p>
+        <img src={gitHubLogo} alt="github logo" className='w-6 h-6 mx-2' />
+      </a>
 
 
     </div>
