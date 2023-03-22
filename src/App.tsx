@@ -100,10 +100,10 @@ function App() {
       }
     }
 
-    const response = await fetch(`https://random-words5.p.rapidapi.com/getRandom?wordLength=${wordLength}`, options)
-    const body: string = await response.text()
+    // const response = await fetch(`https://random-words5.p.rapidapi.com/getRandom?wordLength=${wordLength}`, options)
+    // const body: string = await response.text()
 
-    // const body = 'hello'
+    const body = 'hello'
     setTargetWord(body.toUpperCase())
   }
 
